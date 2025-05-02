@@ -1,0 +1,13 @@
+{
+  "name": "@potok/react.front-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@potok/react.front"
+    ]
+  },
+  "dependencies": {
+    "@potok/react.front-e2e": "file:"
+  }
+}
