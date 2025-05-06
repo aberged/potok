@@ -1,0 +1,119 @@
+datasource db {
+  provider = "sqlite"
+  url = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../packages/generated/prisma/client"
+}
+
+plugin enhancer {
+    provider = '@core/enhancer'
+    generatePermissionChecker = true
+}
+
+plugin hooks {
+  provider = '@zenstackhq/tanstack-query'
+  output = "./packages/react.front/src/zenstack/tanstack/hooks"
+  target = "react"
+  portable = true
+}
+
+plugin openapi {
+    provider = '@zenstackhq/openapi'
+    output = './openapi.json'
+    title = 'Potok API'
+    version = '0.0.1'
+    summary = 'Potok ZenStack API'
+    description = 'Potok API'
+    flavour = 'rest'
+}
+
+model User {
+  id Int @id() @default(autoincrement())
+
+  name String @unique
+  password String
+  email String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt() 
+  posts Post[]
+  memberOf Group[] @relation("GroupMembers")
+  createdGroups Group[]
+  auths Auth[]
+
+  // anyone can sign up, and user profiles are public
+  @@allow('create', true)
+
+  // users have full access to their own profile
+  @@allow('all', auth().id == this.id)
+
+  //@@allow('read', auths?[crud == 'read' && authId == auth().id])
+  @@allow('read', auth() != null)
+
+  @@auth
+}
+
+model Group {
+  id Int @id() @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  
+  name String
+
+  creator User @relation(fields: [creatorId], references: [id])
+  creatorId Int @default(auth().id)
+
+  members User[] @relation("GroupMembers")
+
+  posts Post[]
+
+  @@allow('create', auth() != null)
+
+  @@allow('read', members?[id == auth().id])
+
+  // users have full access to their own profile
+  @@allow('all', auth().id == this.id)
+}
+
+model Post {
+  id Int @id() @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  content String 
+
+  authorId Int @default(auth().id)
+  author User @relation(fields: [authorId], references: [id])
+
+  groupId Int
+  group Group @relation(fields: [groupId], references: [id])
+
+  auths Auth[]
+
+  @@deny('all', auth() == null)
+  
+  // author has full access
+  @@allow('all', auth() == author)
+
+  @@allow('read', group.members?[id == auth().id])
+
+  @@allow('read', auths?[crud == 'read' && authId == auth().id])
+}
+
+model Auth {
+  idd Int @id() @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  userId Int?
+  user User? @relation(fields: [userId], references: [id])
+  postId Int?
+  post Post? @relation(fields: [postId], references: [id])
+
+  authId Int
+
+  crud String
+}

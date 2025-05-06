@@ -13,7 +13,9 @@
     ],
     "rootDir": "src",
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "sourceMap": true,
+    "inlineSources": true
   },
   "exclude": [
     "out-tsc",

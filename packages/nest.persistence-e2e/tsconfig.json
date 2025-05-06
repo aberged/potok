@@ -4,7 +4,9 @@
     "outDir": "out-tsc/@potok/nest.persistence-e2e",
     "esModuleInterop": true,
     "noUnusedLocals": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "inlineSources": true
   },
   "include": ["jest.config.ts", "src/**/*.ts"],
   "references": []

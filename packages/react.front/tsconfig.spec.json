@@ -10,7 +10,9 @@
       "@nx/react/typings/image.d.ts"
     ],
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "sourceMap": true,
+    "inlineSources": true
   },
   "include": [
     "jest.config.ts",
